@@ -1,0 +1,28 @@
+The thread '<No Name>' (0x2) has exited with code 0 (0x0).
+WIFIMAC: F8.F0.05.7A.77.C2
+WIFIADDR:0.0.0.0
+WIFI Connected!
+WIFIADDR:10.0.0.72
+Connecting to the MQTT server...
+    #### Exception System.InvalidOperationException - CLR_E_INVALID_OPERATION (3) ####
+    #### Message: 
+    #### GHIElectronics.TinyCLR.Devices.Network.Provider.NetworkControllerApiWrapper::GetHostByName [IP: 0000] ####
+    #### System.Net.Dns::GetHostEntry [IP: 000b] ####
+    #### GHIElectronics.TinyCLR.Networking.Mqtt.MqttStream::.ctor [IP: 000d] ####
+    #### GHIElectronics.TinyCLR.Networking.Mqtt.Mqtt::.ctor [IP: 0065] ####
+    #### MqttDemo.MqttHandler::.ctor [IP: 005e] ####
+    #### MqttDemo.Program::NetworkWifiAddressHandler [IP: 0074] ####
+    #### MqttDemo.NetworkWifi::NetworkController_NetworkAddressChanged [IP: 0010] ####
+    #### GHIElectronics.TinyCLR.Devices.Network.NetworkController::OnNetworkAddressChanged [IP: 000e] ####
+    #### GHIElectronics.TinyCLR.Devices.Network.Provider.NetworkControllerApiWrapper::<.ctor>b__8_1 [IP: 001f] ####
+    #### GHIElectronics.TinyCLR.Native.NativeEventHandler::Invoke [IP: 0000] ####
+    #### GHIElectronics.TinyCLR.Native.NativeEventDispatcher::MultiCastCase [IP: 0015] ####
+Exception thrown: 'System.InvalidOperationException' in GHIElectronics.TinyCLR.Devices.Network.dll
+Error on MQTT connection!
+    #### Exception System.NullReferenceException - CLR_E_NULL_REFERENCE (1) ####
+    #### Message: 
+    #### MqttDemo.MqttHandler::IsConnected [IP: 0008] ####
+Exception thrown: 'System.NullReferenceException' in MqttDemo.exe
+An unhandled exception of type 'System.NullReferenceException' occurred in MqttDemo.exe
+
+The program '[13] TinyCLR application: Managed' has exited with code 0 (0x0).
