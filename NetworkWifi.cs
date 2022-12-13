@@ -70,7 +70,7 @@ namespace MqttDemo
 
       wifiSettings.DhcpEnable = true;
       wifiSettings.DynamicDnsEnable = true;
-      wifiSettings.DnsAddresses = new IPAddress[] { new IPAddress(new byte[] { 75, 75, 75, 75 }), new IPAddress(new byte[] { 75, 75, 75, 76 }) };
+      wifiSettings.DnsAddresses = new IPAddress[] { new IPAddress(new byte[] { 8, 8, 8, 8 }) };
 
       var networkController = NetworkController.FromName(SC20260.NetworkController.ATWinc15x0);
 

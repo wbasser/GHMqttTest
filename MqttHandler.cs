@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using GHIElectronics.TinyCLR.Networking.Mqtt;
 
@@ -15,15 +16,26 @@ namespace MqttDemo
     private Mqtt lclClient;
     private MqttClientSetting mqttClientSetting;
     private MqttConnectionSetting mqttConnectionSetting;
+    private System.Security.Authentication.SslProtocols SSLProtocol;
     private ushort intPacketId;
 
     // class initialization
-    public MqttHandler(string broker, int port, string username, string userpass)
+    public MqttHandler(string clientid, string broker, int port, string username, string userpass, X509Certificate certificate)
     {
+      var mqttClientId = clientid;
       var mqttBroker = broker;
       var mqttPort = port;
       var mqttUserName = username;
       var mqttUserPass = userpass;
+      var mqttCertificate = certificate;
+      if (mqttCertificate != null)
+      {
+        SSLProtocol = System.Security.Authentication.SslProtocols.Tls12;
+      }
+      else
+      {
+       SSLProtocol = System.Security.Authentication.SslProtocols.None;
+      }
 
       try
       {
@@ -36,14 +48,15 @@ namespace MqttDemo
           BrokerName = mqttBroker,
           BrokerPort = mqttPort,
           ClientCertificate = null,
-          CaCertificate = null,
-          SslProtocol = System.Security.Authentication.SslProtocols.None
+          CaCertificate = mqttCertificate,
+          SslProtocol = SSLProtocol,
         };
 
         // crate the connection settings
         mqttConnectionSetting = new MqttConnectionSetting
         {
-          ClientId = mqttUserName,
+          ClientId = mqttClientId,
+          UserName = mqttUserName,
           Password = mqttUserPass
         };
 
@@ -54,11 +67,12 @@ namespace MqttDemo
         lclClient.ConnectedChanged += ConnectionChanged;
 
         // connect to the network
-        lclClient.Connect(mqttConnectionSetting);
+        ConnectReturnCode returncode = lclClient.Connect(mqttConnectionSetting);
+        Debug.WriteLine(returncode.ToString()); 
       }
       catch (Exception e)
       {
-        Debug.WriteLine("Error on MQTT connection!");
+        Debug.WriteLine("Error on MQTT connection-" + e.Message);
       }
     }
 
