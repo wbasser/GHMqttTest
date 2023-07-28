@@ -17,11 +17,11 @@ namespace MqttDemo
     private static bool flagMqttConnected = false;
     private static bool flagNetConnected = false;
 
-    public static string  mqttUrl = "io.adafruit.com";
-    public static int mqttPort = 8883;
-    public static string mqttName = "williamb11";
-    public static string mqttPass = "c8077e857451333057f1ab3f67a420cbce4e4b9d";
-    public static string mqttClientId = "ProgLoadII";
+    public static string  mqttUrl = "test.mosquitto.org";
+    public static int mqttPort = 1883;
+    public static string mqttName = "";
+    public static string mqttPass = "";
+    public static string mqttClientId = "MqttTest";
     public static X509Certificate mqttCert;
 
     static void Main()
