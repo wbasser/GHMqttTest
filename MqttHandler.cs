@@ -68,7 +68,7 @@ namespace MqttDemo
 
         // connect to the network
         ConnectReturnCode returncode = lclClient.Connect(mqttConnectionSetting);
-        Debug.WriteLine(returncode.ToString()); 
+        Debug.WriteLine("MQTT Connected - " + returncode.ToString());
       }
       catch (Exception e)
       {
@@ -90,6 +90,7 @@ namespace MqttDemo
     // connection changed handler
     private void ConnectionChanged(object sender)
      {
+      Debug.WriteLine("MQTT Connection state changed!");
       // call the delegate
       OnMqttConnectionDelegate?.Invoke(sender);
     }

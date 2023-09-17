@@ -22,10 +22,11 @@ namespace MqttDemo
     public static string mqttName = "";
     public static string mqttPass = "";
     public static string mqttClientId = "MqttTest";
-    public static X509Certificate mqttCert;
 
     static void Main()
     {
+      var iCount = 0;
+
       // create the the WIFI network
       lclNetWifi = new NetworkWifi();
       lclNetWifi.OnNetworkWifiConnectionDelegate += NetworkWifiConnectionHandler;
@@ -35,9 +36,6 @@ namespace MqttDemo
       var led = GpioController.GetDefault().OpenPin(FEZFeather.GpioPin.Led);
       led.SetDriveMode(GpioPinDriveMode.Output);
 
-      // get the certificate
-      mqttCert = new X509Certificate(MqttDemo.Resources.GetBytes(MqttDemo.Resources.BinaryResources.__adafruit));
-  
       // while loop
       while (true)
       {
@@ -50,6 +48,11 @@ namespace MqttDemo
         { 
           if (lclMqttHandler.IsConnected())
           {
+            // publish a message
+            var strPublish = "Count: " + iCount.ToString();
+            lclMqttHandler.PublishToTopic("TestTopic", strPublish);
+            Debug.WriteLine(strPublish); 
+            iCount++;
           }
         }
       };
@@ -100,8 +103,9 @@ namespace MqttDemo
           Debug.WriteLine("Connecting to the MQTT server...");
 
           // create the mqtt handler
-          lclMqttHandler = new MqttHandler(mqttClientId, mqttUrl, mqttPort, mqttName, mqttPass, mqttCert);
+          lclMqttHandler = new MqttHandler(mqttClientId, mqttUrl, mqttPort, mqttName, mqttPass, null);
           lclMqttHandler.OnMqttConnectionDelegate += MqttConnectionHandler;
+          flagMqttConnected = true;
         }
       }
     }

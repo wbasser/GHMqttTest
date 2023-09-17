@@ -64,8 +64,8 @@ namespace MqttDemo
       // Wifi setting
       var wifiSettings = new WiFiNetworkInterfaceSettings()
       {
-        Ssid = "CyberDevLcl24",
-        Password = "Cyber&%%)",
+        Ssid = "guardnet5",
+        Password = "H@tOne@)!^",
       };
 
       wifiSettings.DhcpEnable = true;
