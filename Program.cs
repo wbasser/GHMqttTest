@@ -28,7 +28,15 @@ namespace MqttDemo
       var iCount = 0;
 
       // create the the WIFI network
-      lclNetWifi = new NetworkWifi();
+      lclNetWifi = new NetworkWifi("guardnet5", 
+        "H@tOne@)!^",
+        SC20100.SpiBus.Spi3,
+        SC20100.GpioPin.Id,
+        SC20100.NetworkController.ATWinc15x0,
+        FEZFeather.GpioPin.WiFiEnable,
+        FEZFeather.GpioPin.WiFiChipselect,
+        FEZFeather.GpioPin.WiFiInterrupt,
+        FEZFeather.GpioPin.WiFiReset);
       lclNetWifi.OnNetworkWifiConnectionDelegate += NetworkWifiConnectionHandler;
       lclNetWifi.OnNetworkWifiAddressChangedDelegate += NetworkWifiAddressHandler;
       
@@ -55,7 +63,7 @@ namespace MqttDemo
             iCount++;
           }
         }
-      };
+      }
     }
 
     // connection handler

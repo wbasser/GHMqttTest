@@ -5,7 +5,6 @@ using GHIElectronics.TinyCLR.Devices.Gpio;
 using GHIElectronics.TinyCLR.Devices.Network;
 using GHIElectronics.TinyCLR.Devices.Spi;
 using GHIElectronics.TinyCLR.Drivers.Microchip.Winc15x0;
-using GHIElectronics.TinyCLR.Pins;
 
 namespace MqttDemo
 {
@@ -18,25 +17,18 @@ namespace MqttDemo
     public event NetworkWifiAddressChangedDelegate OnNetworkWifiAddressChangedDelegate;
 
     // main class
-    public NetworkWifi()
+    public NetworkWifi(String strSSID, String strPassword, String strSpiName, String strGpioName, String strNetName, int iEnablePin, int iChipSelPin, int iIrqPin, int iResetPin)
     {
-      // define the pins/controllers
-      /// define the pins
-      var enablePinNumber = SC20100.GpioPin.PA8;
-      var chipSelectPinNumber = SC20100.GpioPin.PD15;
-      var irqPinNumber = SC20100.GpioPin.PB12;
-      var resetPinNumber = SC20100.GpioPin.PB13;
-      var spiControllerName = SC20100.SpiBus.Spi3;
-      var gpioControllerName = SC20100.GpioPin.Id;
-
-      var enablePin = GpioController.GetDefault().OpenPin(enablePinNumber);
+      // create the enable pin
+      var enablePin = GpioController.GetDefault().OpenPin(iEnablePin);
       enablePin.SetDriveMode(GpioPinDriveMode.Output);
       enablePin.Write(GpioPinValue.High);
 
+      // create the chip select
+      var chipselect = GpioController.GetDefault().OpenPin(iChipSelPin);
+
+      // set up the connection setting
       SpiNetworkCommunicationInterfaceSettings netInterfaceSettings = new SpiNetworkCommunicationInterfaceSettings();
-
-      var chipselect = GpioController.GetDefault().OpenPin(chipSelectPinNumber);
-
       var settings = new SpiConnectionSettings()
       {
         ChipSelectLine = chipselect,
@@ -48,40 +40,31 @@ namespace MqttDemo
       };
 
       // netInterfaceSettings
-      netInterfaceSettings.SpiApiName = spiControllerName;
+      netInterfaceSettings.SpiApiName = strSpiName;
       netInterfaceSettings.SpiSettings = settings;
-
-      netInterfaceSettings.GpioApiName = gpioControllerName;
-
-      netInterfaceSettings.InterruptPin = GpioController.GetDefault().OpenPin(irqPinNumber);
+      netInterfaceSettings.GpioApiName = strGpioName;
+      netInterfaceSettings.InterruptPin = GpioController.GetDefault().OpenPin(iIrqPin);
       netInterfaceSettings.InterruptEdge = GpioPinEdge.FallingEdge;
       netInterfaceSettings.InterruptDriveMode = GpioPinDriveMode.InputPullUp;
-
-      netInterfaceSettings.ResetPin = GpioController.GetDefault().OpenPin(resetPinNumber);
+      netInterfaceSettings.ResetPin = GpioController.GetDefault().OpenPin(iResetPin);
       netInterfaceSettings.ResetActiveState = GpioPinValue.Low;
-
 
       // Wifi setting
       var wifiSettings = new WiFiNetworkInterfaceSettings()
       {
-        Ssid = "guardnet5",
-        Password = "H@tOne@)!^",
+        Ssid = strSSID,
+        Password = strPassword,
       };
-
       wifiSettings.DhcpEnable = true;
       wifiSettings.DynamicDnsEnable = true;
       wifiSettings.DnsAddresses = new IPAddress[] { new IPAddress(new byte[] { 8, 8, 8, 8 }) };
 
-      var networkController = NetworkController.FromName(SC20260.NetworkController.ATWinc15x0);
-
+      var networkController = NetworkController.FromName(strNetName);
       networkController.SetInterfaceSettings(wifiSettings);
       networkController.SetCommunicationInterfaceSettings(netInterfaceSettings);
       networkController.SetAsDefaultController();
-
       networkController.NetworkAddressChanged += NetworkController_NetworkAddressChanged;
-
       networkController.NetworkLinkConnectedChanged += NetworkController_NetworkLinkConnectedChanged;
-
       networkController.Enable();
 
       // get the mac address
