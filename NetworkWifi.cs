@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Threading;
 using GHIElectronics.TinyCLR.Devices.Gpio;
 using GHIElectronics.TinyCLR.Devices.Network;
 using GHIElectronics.TinyCLR.Devices.Spi;
@@ -70,6 +71,9 @@ namespace MqttDemo
       // get the mac address
       byte[] macAddress = Winc15x0Interface.GetMacAddress();
       Debug.WriteLine("WIFIMAC: " + macAddress[0].ToString("X") + "." + macAddress[1].ToString("X") + "." + macAddress[2].ToString("X") + "." + macAddress[3].ToString("X") + "." + macAddress[4].ToString("X") + "." + macAddress[5].ToString("X"));
+ 
+      // sleep
+      Thread.Sleep(Timeout.Infinite);
     }
 
     private void NetworkController_NetworkLinkConnectedChanged(NetworkController sender, NetworkLinkConnectedChangedEventArgs e)
