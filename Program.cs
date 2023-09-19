@@ -5,7 +5,6 @@ using System.Threading;
 using GHIElectronics.TinyCLR.Devices.Network;
 using GHIElectronics.TinyCLR.Devices.Gpio;
 using GHIElectronics.TinyCLR.Pins;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MqttDemo
 {
