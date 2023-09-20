@@ -17,22 +17,26 @@ namespace MqttDemo
     public event NetworkWifiConnectionDelegate OnNetworkWifiConnectionDelegate;
     public event NetworkWifiAddressChangedDelegate OnNetworkWifiAddressChangedDelegate;
 
+    // local variables
+    private static NetworkController networkController = null;
+
     // main class
-    public NetworkWifi(String strSSID, String strPassword, String strSpiName, String strGpioName, String strNetName, int iEnablePin, int iChipSelPin, int iIrqPin, int iResetPin)
+    public NetworkWifi(String strSSID, String strPassword, String strSpiName, String strGpioName, String strNetName, int iEnablePin, int iChipSelPin, int iIrqPin, int iResetPin, bool bSetAsDefault)
     {
+      // get the local GPIO controller
+      GpioController lclGpio = GpioController.GetDefault();
       // create the enable pin
-      var enablePin = GpioController.GetDefault().OpenPin(iEnablePin);
-      enablePin.SetDriveMode(GpioPinDriveMode.Output);
-      enablePin.Write(GpioPinValue.High);
+      GpioPin pinEnable = lclGpio.OpenPin(iEnablePin);
+      pinEnable.SetDriveMode(GpioPinDriveMode.Output);
+      pinEnable.Write(GpioPinValue.High);
 
       // create the chip select
-      var chipselect = GpioController.GetDefault().OpenPin(iChipSelPin);
+      GpioPin pinChipSelect = lclGpio.OpenPin(iChipSelPin);
 
       // set up the connection setting
-      SpiNetworkCommunicationInterfaceSettings netInterfaceSettings = new SpiNetworkCommunicationInterfaceSettings();
       var settings = new SpiConnectionSettings()
       {
-        ChipSelectLine = chipselect,
+        ChipSelectLine = pinChipSelect,
         ClockFrequency = 4000000,
         Mode = SpiMode.Mode0,
         ChipSelectType = SpiChipSelectType.Gpio,
@@ -41,39 +45,63 @@ namespace MqttDemo
       };
 
       // netInterfaceSettings
+      SpiNetworkCommunicationInterfaceSettings netInterfaceSettings = new SpiNetworkCommunicationInterfaceSettings();
       netInterfaceSettings.SpiApiName = strSpiName;
       netInterfaceSettings.SpiSettings = settings;
       netInterfaceSettings.GpioApiName = strGpioName;
-      netInterfaceSettings.InterruptPin = GpioController.GetDefault().OpenPin(iIrqPin);
+      netInterfaceSettings.InterruptPin = lclGpio.OpenPin(iIrqPin);
       netInterfaceSettings.InterruptEdge = GpioPinEdge.FallingEdge;
       netInterfaceSettings.InterruptDriveMode = GpioPinDriveMode.InputPullUp;
-      netInterfaceSettings.ResetPin = GpioController.GetDefault().OpenPin(iResetPin);
+      netInterfaceSettings.ResetPin = lclGpio.OpenPin(iResetPin);
       netInterfaceSettings.ResetActiveState = GpioPinValue.Low;
 
       // Wifi setting
-      var wifiSettings = new WiFiNetworkInterfaceSettings()
-      {
-        Ssid = strSSID,
-        Password = strPassword,
-      };
+      var wifiSettings = new WiFiNetworkInterfaceSettings();
+      wifiSettings.Ssid = strSSID;
+      wifiSettings.Password = strPassword;
       wifiSettings.DhcpEnable = true;
       wifiSettings.DynamicDnsEnable = true;
       wifiSettings.DnsAddresses = new IPAddress[] { new IPAddress(new byte[] { 8, 8, 8, 8 }) };
 
-      var networkController = NetworkController.FromName(strNetName);
+      // set up the network controller
+      networkController = NetworkController.FromName(strNetName);
       networkController.SetInterfaceSettings(wifiSettings);
       networkController.SetCommunicationInterfaceSettings(netInterfaceSettings);
-      networkController.SetAsDefaultController();
       networkController.NetworkAddressChanged += NetworkController_NetworkAddressChanged;
       networkController.NetworkLinkConnectedChanged += NetworkController_NetworkLinkConnectedChanged;
       networkController.Enable();
 
+      // check for default
+      if (bSetAsDefault)
+      {
+        // set as default
+        networkController.SetAsDefaultController();
+      }
+    }
+
+    public void SetDefaultNetworkState(bool bState)
+    {
+      if (bState)
+      {
+        networkController.SetAsDefaultController();
+      }
+    }
+
+    public int GetSignalStrength()
+    {
+      int iRssi = Winc15x0Interface.GetRssi();
+
+      // return the signal strenth
+      return(iRssi);
+    }
+
+    public byte[] GetMacAddress()
+    {
       // get the mac address
-      byte[] macAddress = Winc15x0Interface.GetMacAddress();
-      Debug.WriteLine("WIFIMAC: " + macAddress[0].ToString("X") + "." + macAddress[1].ToString("X") + "." + macAddress[2].ToString("X") + "." + macAddress[3].ToString("X") + "." + macAddress[4].ToString("X") + "." + macAddress[5].ToString("X"));
- 
-      // sleep
-      Thread.Sleep(Timeout.Infinite);
+      byte[] mac = Winc15x0Interface.GetMacAddress();
+
+      // return it
+      return mac;
     }
 
     private void NetworkController_NetworkLinkConnectedChanged(NetworkController sender, NetworkLinkConnectedChangedEventArgs e)

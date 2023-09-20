@@ -35,7 +35,9 @@ namespace MqttDemo
         FEZFeather.GpioPin.WiFiEnable,
         FEZFeather.GpioPin.WiFiChipselect,
         FEZFeather.GpioPin.WiFiInterrupt,
-        FEZFeather.GpioPin.WiFiReset);
+        FEZFeather.GpioPin.WiFiReset,
+        true
+        );
       lclNetWifi.OnNetworkWifiConnectionDelegate += NetworkWifiConnectionHandler;
       lclNetWifi.OnNetworkWifiAddressChangedDelegate += NetworkWifiAddressHandler;
       
